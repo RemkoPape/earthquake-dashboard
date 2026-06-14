@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Geo Dashboards</title>
+  <title>Dashboard Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -15,7 +15,6 @@
       --muted: #b9c4d0;
       --accent: #7dd3fc;
       --accent-2: #fbbf24;
-      --danger: #fb7185;
       --green: #34d399;
       --shadow: rgba(0, 0, 0, 0.35);
     }
@@ -31,7 +30,7 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
         radial-gradient(circle at top left, rgba(125, 211, 252, 0.18), transparent 34%),
-        radial-gradient(circle at top right, rgba(251, 191, 36, 0.14), transparent 28%),
+        radial-gradient(circle at top right, rgba(251, 191, 36, 0.13), transparent 28%),
         radial-gradient(circle at bottom right, rgba(52, 211, 153, 0.12), transparent 32%),
         var(--bg);
       color: var(--text);
@@ -73,6 +72,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      text-decoration: none;
     }
 
     .logo {
@@ -154,8 +154,7 @@
       border-radius: 50%;
       right: -160px;
       top: -130px;
-      background:
-        radial-gradient(circle, rgba(125, 211, 252, 0.32), transparent 65%);
+      background: radial-gradient(circle, rgba(125, 211, 252, 0.32), transparent 65%);
       pointer-events: none;
     }
 
@@ -472,18 +471,19 @@
 <body>
   <div class="page">
     <header>
-      <a class="brand" href="./" aria-label="Geo Dashboards home">
+      <a class="brand" href="./" aria-label="Dashboard Hub home">
         <div class="logo"></div>
         <div class="brand-text">
-          <strong>Geo Dashboards</strong>
-          <span>Live geoscience monitoring tools</span>
+          <strong>Dashboard Hub</strong>
+          <span>Personal tools, maps, notes, and live dashboards</span>
         </div>
       </a>
 
       <nav>
-        <a href="./Earthquakes/">Earthquakes</a>
-        <a href="./Volcanoes/">Volcanoes</a>
-        <a href="./Weather/">Weather</a>
+        <a href="./earthquakes/">Earthquakes</a>
+        <a href="./tools/">Tools</a>
+        <a href="./notes/">Notes</a>
+        <a href="./maps/">Maps</a>
         <a href="#about">About</a>
       </nav>
     </header>
@@ -493,39 +493,39 @@
         <div class="hero-card">
           <div class="eyebrow">
             <span class="pulse"></span>
-            Live dashboards for geoscience data
+            Personal dashboard system
           </div>
 
-          <h1>Monitor the planet from one clean map hub.</h1>
+          <h1>One clean hub for useful interactive tools.</h1>
 
           <p>
-            A personal collection of interactive web maps for earthquakes, hazards,
-            weather, climate, and fieldwork-related geodata. Built as lightweight
-            GitHub Pages tools that can also be embedded inside Obsidian.
+            A lightweight collection of dashboards, maps, calculators, notes, and
+            small web tools. Each module is separate, so it can be opened directly
+            in a browser or embedded inside Obsidian.
           </p>
 
           <div class="hero-actions">
-            <a class="button primary" href="./Earthquakes/">Open earthquake map</a>
-            <a class="button secondary" href="#dashboards">View dashboards</a>
+            <a class="button primary" href="./earthquakes/">Open earthquake dashboard</a>
+            <a class="button secondary" href="#dashboards">View all modules</a>
           </div>
         </div>
 
         <div class="side-stack">
           <aside class="side-card">
-            <h2>Current setup</h2>
+            <h2>How it works</h2>
             <p>
-              Static GitHub Pages site with live JavaScript fetching from public APIs.
-              No backend server is needed.
+              This is a static GitHub Pages site. Each dashboard can still load live
+              data using JavaScript, without needing your own backend server.
             </p>
 
             <div class="mini-stats">
               <div class="mini-stat">
                 <strong>01</strong>
-                <span>active map</span>
+                <span>active module</span>
               </div>
               <div class="mini-stat">
                 <strong>∞</strong>
-                <span>future modules</span>
+                <span>future tools</span>
               </div>
             </div>
           </aside>
@@ -533,8 +533,8 @@
           <aside class="side-card">
             <h2>Obsidian ready</h2>
             <p>
-              Each dashboard has its own URL, so you can embed only the maps you want
-              into specific Obsidian notes using an iframe.
+              Every module has its own URL. That makes it easy to embed one specific
+              dashboard into a note, daily dashboard, project page, or command center.
             </p>
           </aside>
         </div>
@@ -543,7 +543,7 @@
       <section id="dashboards">
         <div class="section-title">
           <div>
-            <h2>Dashboards</h2>
+            <h2>Modules</h2>
             <p>Separate pages for separate tools.</p>
           </div>
         </div>
@@ -551,10 +551,10 @@
         <div class="tools-grid">
           <a class="tool-card" href="./earthquakes/" style="--card-accent: #f97316;">
             <div class="tool-icon">◉</div>
-            <h3>Live Earthquakes</h3>
+            <h3>Earthquake Dashboard</h3>
             <p>
-              Global significant and high-magnitude earthquakes using USGS real-time
-              GeoJSON feeds, coloured by alert level or magnitude fallback.
+              A live global earthquake map using USGS real-time data, with colour,
+              magnitude, event popups, and refresh logic.
             </p>
 
             <div class="tool-footer">
@@ -563,12 +563,12 @@
             </div>
           </a>
 
-          <a class="tool-card" href="./volcanoes/" style="--card-accent: #ef4444;">
-            <div class="tool-icon">△</div>
-            <h3>Volcanoes</h3>
+          <a class="tool-card" href="./tools/" style="--card-accent: #38bdf8;">
+            <div class="tool-icon">⌘</div>
+            <h3>Tools</h3>
             <p>
-              Placeholder for volcanic activity, alerts, ash advisories, or global
-              volcano reference layers.
+              Placeholder for calculators, converters, scripts, study utilities,
+              fieldwork helpers, or small browser-based workflows.
             </p>
 
             <div class="tool-footer">
@@ -577,12 +577,26 @@
             </div>
           </a>
 
-          <a class="tool-card" href="./weather/" style="--card-accent: #38bdf8;">
-            <div class="tool-icon">≈</div>
-            <h3>Weather & Climate</h3>
+          <a class="tool-card" href="./notes/" style="--card-accent: #a78bfa;">
+            <div class="tool-icon">✦</div>
+            <h3>Notes & Knowledge</h3>
             <p>
-              Placeholder for weather stations, climate variables, snow depth,
-              precipitation, or fieldwork-relevant forecasts.
+              Placeholder for note dashboards, reading lists, summaries, project
+              indexes, or Obsidian-linked knowledge views.
+            </p>
+
+            <div class="tool-footer">
+              <span class="status">Planned</span>
+              <span class="arrow">→</span>
+            </div>
+          </a>
+
+          <a class="tool-card" href="./maps/" style="--card-accent: #34d399;">
+            <div class="tool-icon">◎</div>
+            <h3>Maps</h3>
+            <p>
+              Placeholder for general interactive maps, field locations, travel maps,
+              study areas, or spatial data viewers.
             </p>
 
             <div class="tool-footer">
@@ -596,8 +610,8 @@
       <section id="about">
         <div class="section-title">
           <div>
-            <h2>How this site is organised</h2>
-            <p>One repository, multiple independent dashboard pages.</p>
+            <h2>Site organisation</h2>
+            <p>One repository, multiple independent modules.</p>
           </div>
         </div>
 
@@ -605,14 +619,15 @@
           <div class="note-card">
             <h3>Repository structure</h3>
             <p>
-              Each folder contains one dashboard. This keeps the site clean and makes
-              it easy to embed separate tools in Obsidian.
+              Each folder contains one independent dashboard or tool. This keeps the
+              site flexible as it grows beyond only geoscience maps.
             </p>
 
             <ul>
-              <li><code>/earthquakes/</code> for the live earthquake map</li>
-              <li><code>/volcanoes/</code> for a future volcano dashboard</li>
-              <li><code>/weather/</code> for a future weather or climate dashboard</li>
+              <li><code>/earthquakes/</code> for the live earthquake dashboard</li>
+              <li><code>/tools/</code> for small utilities and calculators</li>
+              <li><code>/notes/</code> for knowledge dashboards or indexes</li>
+              <li><code>/maps/</code> for general map-based projects</li>
               <li><code>/assets/</code> for shared images, CSS, or scripts later</li>
             </ul>
           </div>
@@ -620,11 +635,11 @@
           <div class="note-card">
             <h3>Embed example</h3>
             <p>
-              In Obsidian, embed a specific dashboard with:
+              In Obsidian, embed a specific module with:
             </p>
 
             <p>
-              <code>&lt;iframe src="https://remkopape.github.io/geo-dashboards/earthquakes/" width="100%" height="700"&gt;&lt;/iframe&gt;</code>
+              <code>&lt;iframe src="https://remkopape.github.io/dashboard-hub/earthquakes/" width="100%" height="700"&gt;&lt;/iframe&gt;</code>
             </p>
           </div>
         </div>
@@ -632,7 +647,7 @@
     </main>
 
     <footer>
-      Built with GitHub Pages. Data sources are loaded live inside each dashboard.
+      Built with GitHub Pages. Modules can be opened directly or embedded in Obsidian.
     </footer>
   </div>
 </body>
