@@ -227,6 +227,14 @@
       margin-top: 8px;
     }
 
+    .popup-button.secondary {
+      background: #6b7280;
+    }
+    
+    .popup-button.secondary:hover {
+      background: #7b8492;
+    }
+
     .popup-button:hover {
       background: #586b84;
     }
@@ -559,6 +567,31 @@ function buildFeedUrl(config) {
       window.open(obsidianUrl, "_blank");
     }
 
+    async function copyEventMarkdown(properties, coordinates) {
+        const markdown = createObsidianMarkdown(properties, coordinates);
+      
+        try {
+          await navigator.clipboard.writeText(markdown);
+          alert("Earthquake note copied. Paste it into Obsidian.");
+        } catch (error) {
+          console.error(error);
+      
+          const textArea = document.createElement("textarea");
+          textArea.value = markdown;
+          document.body.appendChild(textArea);
+          textArea.select();
+      
+          try {
+            document.execCommand("copy");
+            alert("Earthquake note copied. Paste it into Obsidian.");
+          } catch (fallbackError) {
+            alert("Could not copy automatically. Open the map in your browser instead.");
+          }
+      
+          document.body.removeChild(textArea);
+        }
+      }
+
     function popupHtml(properties, coordinates) {
       const cls = impactClass(properties);
       const colour = colourForClass(cls);
@@ -618,6 +651,11 @@ function buildFeedUrl(config) {
           <button class="popup-button" id="obsidian-note-button">
             Create Obsidian note
           </button>
+    
+          <button class="popup-button secondary" id="copy-markdown-button">
+            Copy note markdown
+          </button>
+          
           </div>
         </div>
       `;
@@ -695,13 +733,20 @@ function buildFeedUrl(config) {
         
           const popupElement = popup.getElement();
         
-          const obsidianButton = popupElement.querySelector("#obsidian-note-button");
+        const obsidianButton = popupElement.querySelector("#obsidian-note-button");
+        const copyMarkdownButton = popupElement.querySelector("#copy-markdown-button");
         
-          if (obsidianButton) {
-            obsidianButton.addEventListener("click", () => {
-              openEventInObsidian(properties, coordinates);
-            });
-          }
+        if (obsidianButton) {
+          obsidianButton.addEventListener("click", () => {
+            openEventInObsidian(properties, coordinates);
+          });
+        }
+        
+        if (copyMarkdownButton) {
+          copyMarkdownButton.addEventListener("click", () => {
+            copyEventMarkdown(properties, coordinates);
+          });
+        }
         });
 
         map.on("mouseenter", "earthquake-points", () => {
