@@ -235,29 +235,33 @@
       background: #7b8492;
     }
 
-    .home-button {
+    .map-controls {
       position: absolute;
       top: 16px;
-      right: 235px;
+      right: 58px;
       z-index: 4;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      height: 38px;
-      padding: 0 14px;
-      border-radius: 14px;
-      background: rgba(18, 24, 31, 0.88);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      color: #f5f7fa;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 700;
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.32);
-      backdrop-filter: blur(10px);
     }
 
-    .home-button:hover {
-      background: rgba(255, 255, 255, 0.13);
+    .home-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      width: fit-content;
+      margin-bottom: 10px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--panel-border);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .home-link:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.14);
     }
 
     .popup-button:hover {
@@ -269,10 +273,6 @@
     }
 
     .feed-switcher {
-      position: absolute;
-      top: 16px;
-      right: 58px;
-      z-index: 3;
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
       border-radius: 14px;
@@ -300,16 +300,15 @@
         display: none;
       }
 
-      .home-button {
-        top: auto;
-        right: 16px;
-        bottom: 64px;
-      }
-
-      .feed-switcher {
+      .map-controls {
         top: auto;
         right: 16px;
         bottom: 16px;
+        width: min(260px, calc(100vw - 32px));
+      }
+
+      .feed-switcher select {
+        width: 100%;
       }
 
       .top-panel {
@@ -321,10 +320,24 @@
 
 <body>
   <div id="map"></div>
-  <a class="home-button" href="../" title="Go to dashboard">
-  ← Dashboard
-  </a>  
+
+  <div class="map-controls">
+    <div class="feed-switcher">
+      <select id="feedSelect">
+        <option value="m5_day">M5.0+, past 24 hours</option>
+        <option value="m5_week" selected>M5.0+, past 7 days</option>
+        <option value="m5_month">M5.0+, past 30 days</option>
+        <option value="m55_month">M5.5+, past 30 days</option>
+        <option value="m6_month">M6.0+, past 30 days</option>
+        <option value="significant_month">USGS significant, past 30 days</option>
+      </select>
+    </div>
+  </div>
+
   <section class="top-panel">
+    <a class="home-link" href="../" title="Go to dashboard">
+      ← Dashboard home
+    </a>
     <h1>Live Global Earthquakes</h1>
     <p>
       Significant and high-magnitude earthquakes from USGS real-time GeoJSON feeds.
@@ -347,16 +360,6 @@
     </div>
   </section>
 
-  <div class="feed-switcher">
-    <select id="feedSelect">
-      <option value="m5_day">M5.0+, past 24 hours</option>
-      <option value="m5_week" selected>M5.0+, past 7 days</option>
-      <option value="m5_month">M5.0+, past 30 days</option>
-      <option value="m55_month">M5.5+, past 30 days</option>
-      <option value="m6_month">M6.0+, past 30 days</option>
-      <option value="significant_month">USGS significant, past 30 days</option>
-    </select>
-  </div>
 
   <section class="legend">
     <div class="legend-title">Impact / intensity proxy</div>
