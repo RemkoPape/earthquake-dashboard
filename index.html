@@ -209,6 +209,27 @@
       font-weight: 700;
       font-size: 13px;
     }
+    
+    .popup-button {
+      display: inline-block;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+      text-decoration: none;
+      background: #44546a;
+      color: #ffffff;
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .popup-button:hover {
+      background: #586b84;
+    }
 
     .popup-link:hover {
       background: #2d3a47;
@@ -450,6 +471,94 @@ function buildFeedUrl(config) {
       return new Date(milliseconds).toISOString().replace("T", " ").slice(0, 16) + " UTC";
     }
 
+    function safeFileName(text) {
+  return String(text)
+    .replace(/[\\/:*?"<>|]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 120);
+    }
+    
+    function createObsidianMarkdown(properties, coordinates) {
+      const mag = formatValue(properties.mag);
+      const place = formatValue(properties.place, "Unknown location");
+      const timeUTC = formatTime(properties.time);
+    
+      const lon = coordinates[0];
+      const lat = coordinates[1];
+      const depthRaw = coordinates && coordinates.length > 2 ? coordinates[2] : null;
+      const depth = depthRaw !== null ? `${Number(depthRaw).toFixed(1)} km` : "not available";
+    
+      return `---
+    tags:
+      - Earthquake
+      - Geoscience
+      - USGS
+    source: USGS Earthquake Catalog
+    event_id: ${properties.code ?? ""}
+    magnitude: ${mag}
+    depth_km: ${depthRaw ?? ""}
+    latitude: ${lat}
+    longitude: ${lon}
+    time_utc: "${timeUTC}"
+    alert: ${properties.alert ?? ""}
+    mmi: ${properties.mmi ?? ""}
+    felt_reports: ${properties.felt ?? ""}
+    significance: ${properties.sig ?? ""}
+    url: ${properties.url}
+    ---
+    
+    # M${mag} earthquake near ${place}
+    
+    ## Quick summary
+    
+    A magnitude **${mag}** earthquake occurred near **${place}**.
+    
+    ## Event details
+    
+    | Field | Value |
+    |---|---|
+    | Magnitude | ${mag} |
+    | Depth | ${depth} |
+    | Location | ${place} |
+    | Time | ${timeUTC} |
+    | Latitude | ${lat} |
+    | Longitude | ${lon} |
+    | Alert level | ${properties.alert ?? "not assigned"} |
+    | MMI | ${properties.mmi ?? "not available"} |
+    | Felt reports | ${properties.felt ?? "not available"} |
+    | Significance | ${properties.sig ?? "not available"} |
+    
+    ## Map location
+    
+    [Open location](geo:${lat},${lon})
+    
+    ## Source
+    
+    [Open USGS event](${properties.url})
+    `;
+    }
+    
+    function openEventInObsidian(properties, coordinates) {
+      const markdown = createObsidianMarkdown(properties, coordinates);
+    
+      const mag = properties.mag ?? "unknown";
+      const place = safeFileName(properties.place ?? "unknown-location");
+    
+      const date = properties.time
+        ? new Date(properties.time).toISOString().slice(0, 10)
+        : "unknown-date";
+    
+      const fileName = safeFileName(`Earthquake - M${mag} - ${date} - ${place}`);
+    
+      const obsidianUrl =
+        "obsidian://new?" +
+        "name=" + encodeURIComponent(fileName) +
+        "&content=" + encodeURIComponent(markdown);
+    
+      window.open(obsidianUrl, "_blank");
+    }
+
     function popupHtml(properties, coordinates) {
       const cls = impactClass(properties);
       const colour = colourForClass(cls);
@@ -502,9 +611,13 @@ function buildFeedUrl(config) {
             <p><strong>Place:</strong><br>${place}</p>
             <p><strong>Time:</strong><br>${formatTime(properties.time)}</p>
 
-            <a class="popup-link" href="${properties.url}" target="_blank">
-              Open USGS event
-            </a>
+         <a class="popup-link" href="${properties.url}" target="_blank">
+            Open USGS event
+          </a>
+          
+          <button class="popup-button" id="obsidian-note-button">
+            Create Obsidian note
+          </button>
           </div>
         </div>
       `;
@@ -568,15 +681,27 @@ function buildFeedUrl(config) {
           const feature = event.features[0];
           const properties = feature.properties;
           const coordinates = feature.geometry.coordinates.slice();
-
-          new maplibregl.Popup({
+        
+          const popup = new maplibregl.Popup({
             closeButton: true,
             closeOnClick: true,
-            maxWidth: "360px"
+            maxWidth: "340px",
+            offset: 18,
+            focusAfterOpen: false
           })
             .setLngLat(coordinates)
             .setHTML(popupHtml(properties, coordinates))
             .addTo(map);
+        
+          const popupElement = popup.getElement();
+        
+          const obsidianButton = popupElement.querySelector("#obsidian-note-button");
+        
+          if (obsidianButton) {
+            obsidianButton.addEventListener("click", () => {
+              openEventInObsidian(properties, coordinates);
+            });
+          }
         });
 
         map.on("mouseenter", "earthquake-points", () => {
