@@ -439,7 +439,7 @@ function buildFeedUrl(config) {
         sources: {
           osm: {
             type: "raster",
-            tiles: ["https://tile.openstreetmOap.org/{z}/{x}/{y}.png"],
+            tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
             tileSize: 256,
             attribution: "© OpenStreetMap contributors"
           }
@@ -813,7 +813,7 @@ A magnitude **${mag}** earthquake occurred near **${place}** on **${timeUTC}**.
           const feature = event.features[0];
           const properties = feature.properties;
           const coordinates = feature.geometry.coordinates.slice();
-        
+
           const popup = new maplibregl.Popup({
             closeButton: true,
             closeOnClick: true,
@@ -824,31 +824,30 @@ A magnitude **${mag}** earthquake occurred near **${place}** on **${timeUTC}**.
             .setLngLat(coordinates)
             .setHTML(popupHtml(properties, coordinates))
             .addTo(map);
-        
+
           const popupElement = popup.getElement();
-        
           const obsidianButton = popupElement.querySelector("#obsidian-note-button");
           const copyMarkdownButton = popupElement.querySelector("#copy-markdown-button");
           const copyImportButton = popupElement.querySelector("#copy-import-button");
-        
-        if (obsidianButton) {
-          obsidianButton.addEventListener("click", () => {
-            openEventInObsidian(properties, coordinates);
-          });
-        }
-        
-        if (copyMarkdownButton) {
-          copyMarkdownButton.addEventListener("click", () => {
-            copyEventMarkdown(properties, coordinates);
-          });
-        }
-        });
 
-        if (copyImportButton) {
-          copyImportButton.addEventListener("click", () => {
-            copyAndImportEventMarkdown(properties, coordinates);
-          });
-}
+          if (obsidianButton) {
+            obsidianButton.addEventListener("click", () => {
+              openEventInObsidian(properties, coordinates);
+            });
+          }
+
+          if (copyMarkdownButton) {
+            copyMarkdownButton.addEventListener("click", () => {
+              copyEventMarkdown(properties, coordinates);
+            });
+          }
+
+          if (copyImportButton) {
+            copyImportButton.addEventListener("click", () => {
+              copyAndImportEventMarkdown(properties, coordinates);
+            });
+          }
+        });
 
         map.on("mouseenter", "earthquake-points", () => {
           map.getCanvas().style.cursor = "pointer";
