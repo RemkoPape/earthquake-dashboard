@@ -842,6 +842,7 @@
         <nav class="top-links">
           <a class="chip-link" href="./documents/">Documents</a>
           <a class="chip-link" href="./earthquakes/">Earthquakes</a>
+          <a class="chip-link" href="./wildfires/">Wildfires</a>
           <a class="chip-link" href="./news/">RSS Notes</a>
           <a class="chip-link" href="https://github.com/remkopape/dashboard-hub" target="_blank" rel="noopener">GitHub</a>
 
@@ -866,6 +867,7 @@
 
             <div class="notif-actions">
                 <a class="chip-link" href="./earthquakes/">Earthquakes</a>
+                <a class="chip-link" href="./wildfires/">Wildfires</a>
                 <a class="chip-link" href="./documents/">Documents</a>
                 <a class="chip-link" href="./news/">RSS Notes</a>
               </div>
@@ -895,6 +897,7 @@
           <div class="summary-tags">
             <span class="summary-tag">Documents</span>
             <span class="summary-tag">Live earthquakes</span>
+            <span class="summary-tag">Live wildfires</span>
             <span class="summary-tag">RSS notes</span>
           </div>
         </div>
@@ -904,7 +907,7 @@
             <h2>README</h2>
             <p>
               A compact hub for a shareable document page, a live earthquake map,
-              and RSS-to-Obsidian notes that link articles back into the site.
+              a live wildfire map, and RSS-to-Obsidian notes that link articles back into the site.
             </p>
           </aside>
 
@@ -948,12 +951,12 @@
             </div>
           </a>
 
-          <a class="tool-card" href="./tools/" style="--card-accent: #38bdf8;">
-            <div class="tool-icon">&#8984;</div>
-            <h3>Tools</h3>
-            <p>Space for small helpers, calculators, and workflows.</p>
+          <a class="tool-card" href="./wildfires/" style="--card-accent: #ef4444;">
+            <div class="tool-icon">&#128293;</div>
+            <h3>Wildfires</h3>
+            <p>Live NASA FIRMS map with intensity, confidence, and satellite filters.</p>
             <div class="tool-footer">
-              <span class="status">Planned</span>
+              <span class="status">Live</span>
               <span class="arrow">&#8594;</span>
             </div>
           </a>
@@ -989,6 +992,7 @@
     </main>
   </div>
 
+  <script src="./wildfires/config.js"></script>
   <script src="./news/feeds.js"></script>
   <script>
     const notificationButton = document.getElementById('notificationButton');
@@ -1003,6 +1007,8 @@
     const notificationWindowMs = 72 * 60 * 60 * 1000;
     const repoFullName = 'remkopape/dashboard-hub';
     const currentTime = Date.now();
+    const wildfireSourceUrl = 'https://firms.modaps.eosdis.nasa.gov/';
+    const wildfireSources = ['VIIRS_SNPP_NRT', 'VIIRS_NOAA20_NRT', 'VIIRS_NOAA21_NRT'];
 
     function loadDismissedNotifications() {
       try {
@@ -1046,6 +1052,58 @@
         month: 'short',
         day: 'numeric',
       }).format(new Date(isoString));
+    }
+
+    function parseCsvLine(line) {
+      const values = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let index = 0; index < line.length; index += 1) {
+        const char = line[index];
+        const next = line[index + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            index += 1;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          values.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+
+      values.push(current);
+      return values;
+    }
+
+    function parseCsvRows(text) {
+      const normalized = String(text || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      const lines = normalized.split('\n').filter((line) => line.trim() !== '');
+      if (!lines.length) return [];
+
+      const headers = parseCsvLine(lines[0]).map((header) => header.trim());
+      return lines.slice(1).map((line) => {
+        const values = parseCsvLine(line);
+        const row = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] ?? '';
+        });
+        return row;
+      });
+    }
+
+    function wildfireTimestamp(row) {
+      if (!row || !row.acq_date) return 0;
+      const timeText = String(row.acq_time || '0000').trim().padStart(4, '0');
+      const isoText = `${row.acq_date}T${timeText.slice(0, 2)}:${timeText.slice(2, 4)}:00Z`;
+      const parsed = new Date(isoText).getTime();
+      return Number.isFinite(parsed) ? parsed : 0;
     }
 
     function isRecent(milliseconds) {
@@ -1216,6 +1274,60 @@
       }
     }
 
+    async function fetchWildfireNotification() {
+      try {
+        const key = window.WILDFIRE_CONFIG && window.WILDFIRE_CONFIG.FIRMS_MAP_KEY
+          ? String(window.WILDFIRE_CONFIG.FIRMS_MAP_KEY)
+          : '';
+        if (!key) return null;
+
+        const results = await Promise.all(wildfireSources.map(async (sourceName) => {
+          const response = await fetch(`${wildfireSourceUrl}api/area/csv/${encodeURIComponent(key)}/${sourceName}/world/1`, {
+            cache: 'no-store',
+          });
+          if (!response.ok) throw new Error(`FIRMS returned ${response.status} for ${sourceName}`);
+          const rows = parseCsvRows(await response.text());
+          if (!rows.length) return null;
+
+          let latestRow = null;
+          let latestTime = 0;
+          rows.forEach((row) => {
+            const timestamp = wildfireTimestamp(row);
+            if (timestamp > latestTime) {
+              latestTime = timestamp;
+              latestRow = row;
+            }
+          });
+
+          return latestRow && latestTime
+            ? { row: latestRow, timestamp: latestTime, sourceName }
+            : null;
+        }));
+
+        const latest = results.filter(Boolean).sort((a, b) => b.timestamp - a.timestamp)[0];
+        if (!latest || !isRecent(latest.timestamp)) return null;
+
+        const row = latest.row;
+        const latitude = Number(row.latitude);
+        const longitude = Number(row.longitude);
+        const locationText = Number.isFinite(latitude) && Number.isFinite(longitude)
+          ? `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`
+          : 'unknown location';
+        const confidence = row.confidence ? `Confidence ${row.confidence}` : 'Recent detection';
+
+        return {
+          id: `wildfire:${latest.sourceName}:${row.acq_date || ''}:${row.acq_time || ''}:${row.latitude || ''}:${row.longitude || ''}`,
+          kind: 'Wildfires',
+          title: `Active fire near ${locationText}`,
+          subtitle: `${confidence} · ${formatRelativeTime(latest.timestamp)}`,
+          href: './wildfires/',
+        };
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    }
+
     async function loadHomepageNews() {
       try {
         const payload = await window.DashboardNews.loadFeedBundle({
@@ -1259,14 +1371,16 @@
     }
 
     async function loadNotifications() {
-      const [earthquakeNotification, documentsNotification, newsNotification] = await Promise.all([
+      const [earthquakeNotification, wildfireNotification, documentsNotification, newsNotification] = await Promise.all([
         fetchEarthquakeNotification(),
+        fetchWildfireNotification(),
         fetchDocumentsNotification(),
         fetchNewsNotification(),
       ]);
 
       const notifications = [
         earthquakeNotification,
+        wildfireNotification,
         documentsNotification,
         newsNotification,
         futureNotification(),

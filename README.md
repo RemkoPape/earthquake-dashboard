@@ -5,6 +5,7 @@ A compact GitHub Pages site with a few useful web pages:
 - `index.html` - the main hub and overview
 - `documents/` - a shareable document page for CVs, certificates, and PDFs
 - `earthquakes/` - a live USGS earthquake map and alert view
+- `wildfires/` - a live NASA FIRMS wildfire map
 - `news/` - a selected RSS feed page with a browser-side reader
 
 ## What it is for
@@ -26,17 +27,26 @@ This repo now supports a root `.env` file for the local Python scripts.
 
 Available variables:
 
-- `FIRMS_MAP_KEY` - required for `scripts/update_fires.py`
 - `ONLYNEWS_OUTPUT_DIR` - optional override for `OnlyNews.py` output folder
 - `ONLYNEWS_LIMIT_PER_FEED` - optional override for how many feed items `OnlyNews.py` reads per source
 
 Example:
 
 ```env
-FIRMS_MAP_KEY=your_firms_map_key_here
 ONLYNEWS_OUTPUT_DIR=news
 ONLYNEWS_LIMIT_PER_FEED=8
 ```
+
+## Wildfire data
+
+The wildfire page now fetches NASA FIRMS directly in the browser with a public
+key defined in `wildfires/config.js`.
+
+This means:
+
+- no local wildfire snapshot files are required for the page to work
+- the FIRMS key is public in the frontend
+- the page uses live 24h, 3d, and 5d views instead of repository snapshots
 
 ## Documents
 
