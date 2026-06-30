@@ -1,1 +1,3 @@
 .env
+
+wildfires/data/*.geojson
