@@ -29,16 +29,63 @@
         linear-gradient(180deg, #09111a 0%, #071019 100%);
     }
 
+    body {
+      position: relative;
+      overflow-x: hidden;
+    }
+
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       pointer-events: none;
+      z-index: 1;
       background-image:
         linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
       background-size: 36px 36px;
       mask-image: linear-gradient(to bottom, black, transparent 88%);
+    }
+
+    .mountain-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .mountain-bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(7, 16, 25, 0.18) 0%, rgba(7, 16, 25, 0.48) 56%, rgba(7, 16, 25, 0.9) 100%),
+        linear-gradient(120deg, rgba(8, 13, 20, 0.2) 0%, rgba(8, 13, 20, 0.58) 100%);
+    }
+
+    .mountain-bg__slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transform: scale(1.05);
+      transform-origin: center;
+      animation: mountain-fade 18s infinite;
+      filter: saturate(1.05) contrast(1.05);
+    }
+
+    .mountain-bg__slide:nth-child(1) { animation-delay: 0s; }
+    .mountain-bg__slide:nth-child(2) { animation-delay: 6s; }
+    .mountain-bg__slide:nth-child(3) { animation-delay: 12s; }
+
+    @keyframes mountain-fade {
+      0% { opacity: 0; transform: scale(1.08); }
+      5% { opacity: 1; }
+      28% { opacity: 1; }
+      33% { opacity: 0; transform: scale(1.02); }
+      100% { opacity: 0; transform: scale(1.02); }
     }
 
     a { color: inherit; }
@@ -48,7 +95,7 @@
       margin: 0 auto;
       padding: 18px 0 24px;
       position: relative;
-      z-index: 1;
+      z-index: 2;
     }
 
     .topbar {
@@ -582,9 +629,101 @@
         justify-content: flex-start;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mountain-bg__slide {
+        animation: none;
+        opacity: 0;
+      }
+
+      .mountain-bg__slide:first-child {
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 <body>
+  <div class="mountain-bg" aria-hidden="true">
+    <svg class="mountain-bg__slide" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="skyOne" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#14253a" />
+          <stop offset="58%" stop-color="#2d5778" />
+          <stop offset="100%" stop-color="#9ec8e6" />
+        </linearGradient>
+        <linearGradient id="lakeOne" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#8bc7dd" stop-opacity="0.95" />
+          <stop offset="100%" stop-color="#2a526b" stop-opacity="0.95" />
+        </linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#skyOne)" />
+      <circle cx="1190" cy="156" r="82" fill="#ffd688" opacity="0.9" />
+      <ellipse cx="1210" cy="174" rx="150" ry="28" fill="#ffd688" opacity="0.16" />
+      <path d="M0 572 L210 338 L348 458 L520 286 L735 530 L980 252 L1216 480 L1406 356 L1600 540 L1600 900 L0 900 Z" fill="#233d56" opacity="0.95" />
+      <path d="M0 648 L160 534 L318 620 L512 420 L686 540 L860 396 L1044 560 L1238 456 L1412 590 L1600 520 L1600 900 L0 900 Z" fill="#183042" opacity="0.95" />
+      <path d="M196 405 L348 458 L520 286 L620 398 L600 412 L524 336 L444 394 L366 384 L332 436 Z" fill="#ecf4ff" opacity="0.92" />
+      <path d="M860 396 L980 252 L1122 398 L1076 418 L1010 364 L962 374 L924 430 Z" fill="#f3f7fb" opacity="0.92" />
+      <path d="M1092 392 L1216 480 L1318 388 L1268 366 L1226 402 L1160 370 Z" fill="#edf3fb" opacity="0.92" />
+      <path d="M0 710 C184 686 312 682 460 694 C628 707 802 748 958 742 C1148 735 1288 695 1600 708 L1600 900 L0 900 Z" fill="url(#lakeOne)" opacity="0.85" />
+      <path d="M0 730 C166 712 308 708 458 722 C626 738 804 786 968 776 C1140 767 1310 722 1600 734 L1600 900 L0 900 Z" fill="#5aa0c4" opacity="0.16" />
+      <path d="M0 670 L1600 670 L1600 900 L0 900 Z" fill="#09121b" opacity="0.12" />
+    </svg>
+
+    <svg class="mountain-bg__slide" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="skyTwo" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#07111d" />
+          <stop offset="55%" stop-color="#12243d" />
+          <stop offset="100%" stop-color="#35557d" />
+        </linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#skyTwo)" />
+      <circle cx="1276" cy="172" r="58" fill="#dce8ff" opacity="0.7" />
+      <g fill="#f2f7ff" opacity="0.8">
+        <circle cx="132" cy="118" r="2" />
+        <circle cx="244" cy="198" r="1.7" />
+        <circle cx="388" cy="102" r="2.2" />
+        <circle cx="528" cy="170" r="1.6" />
+        <circle cx="666" cy="92" r="1.9" />
+        <circle cx="782" cy="134" r="1.8" />
+        <circle cx="930" cy="80" r="2.1" />
+        <circle cx="1096" cy="140" r="1.6" />
+        <circle cx="1442" cy="112" r="2" />
+      </g>
+      <path d="M0 590 L168 454 L314 548 L494 352 L658 526 L842 324 L1024 510 L1202 376 L1388 554 L1600 440 L1600 900 L0 900 Z" fill="#1d3653" opacity="0.96" />
+      <path d="M0 652 L204 572 L356 636 L536 480 L720 604 L896 456 L1112 628 L1312 518 L1486 640 L1600 590 L1600 900 L0 900 Z" fill="#122437" opacity="0.98" />
+      <path d="M132 468 L314 548 L494 352 L566 444 L512 442 L470 388 L388 452 L330 426 L282 494 Z" fill="#d8e6fb" opacity="0.88" />
+      <path d="M658 526 L842 324 L944 474 L878 462 L832 408 L784 442 L742 504 Z" fill="#e4ecfa" opacity="0.86" />
+      <path d="M1024 510 L1202 376 L1296 472 L1228 468 L1186 420 L1136 450 L1094 516 Z" fill="#dce7f6" opacity="0.86" />
+      <path d="M0 730 C222 698 378 686 530 698 C718 713 918 766 1120 760 C1286 755 1420 724 1600 720 L1600 900 L0 900 Z" fill="#08111b" opacity="0.9" />
+      <path d="M0 756 C196 742 394 734 560 748 C760 764 946 806 1144 802 C1302 800 1454 780 1600 776 L1600 900 L0 900 Z" fill="#7f93ad" opacity="0.08" />
+    </svg>
+
+    <svg class="mountain-bg__slide" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="skyThree" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#27150f" />
+          <stop offset="42%" stop-color="#704225" />
+          <stop offset="100%" stop-color="#f1c98e" />
+        </linearGradient>
+        <linearGradient id="glowThree" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffd89a" stop-opacity="0.85" />
+          <stop offset="100%" stop-color="#ff9e4a" stop-opacity="0.15" />
+        </linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#skyThree)" />
+      <circle cx="388" cy="178" r="96" fill="#ffe0a7" opacity="0.9" />
+      <ellipse cx="388" cy="194" rx="160" ry="36" fill="url(#glowThree)" opacity="0.45" />
+      <path d="M0 610 L190 474 L356 534 L548 336 L748 574 L930 388 L1120 510 L1314 420 L1600 612 L1600 900 L0 900 Z" fill="#6d4324" opacity="0.92" />
+      <path d="M0 682 L178 598 L382 682 L560 512 L758 636 L944 490 L1126 628 L1320 560 L1480 646 L1600 608 L1600 900 L0 900 Z" fill="#402617" opacity="0.98" />
+      <path d="M190 474 L356 534 L548 336 L642 468 L592 474 L548 404 L476 458 L422 452 L376 510 Z" fill="#f7f0e6" opacity="0.92" />
+      <path d="M748 574 L930 388 L1024 512 L972 522 L922 454 L866 508 L818 530 Z" fill="#f5ecdf" opacity="0.9" />
+      <path d="M1120 510 L1314 420 L1424 540 L1360 532 L1318 480 L1248 498 L1188 548 Z" fill="#f3e7d5" opacity="0.88" />
+      <path d="M0 740 C188 716 356 704 528 712 C718 720 908 770 1100 766 C1280 762 1446 736 1600 728 L1600 900 L0 900 Z" fill="#1b1010" opacity="0.82" />
+      <path d="M0 748 C202 736 396 732 582 742 C766 752 970 790 1180 784 C1366 778 1488 762 1600 756 L1600 900 L0 900 Z" fill="#f2d7aa" opacity="0.08" />
+    </svg>
+  </div>
+
   <div class="page">
     <header class="topbar">
       <a class="brand" href="./" aria-label="Dashboard Hub home">
@@ -603,7 +742,7 @@
 
           <div class="notification-wrap">
           <button class="bell-button" id="notificationButton" type="button" aria-expanded="false" aria-controls="notificationPopover">
-            <span class="bell-icon">🔔</span>
+            <span class="bell-icon">&#128276;</span>
             <span>Notifications</span>
             <span class="bell-count" id="notificationCount" hidden>0</span>
           </button>
@@ -684,42 +823,42 @@
 
         <div class="tools-grid">
           <a class="tool-card" href="./documents/" style="--card-accent: #8b5cf6;">
-            <div class="tool-icon">⇪</div>
+            <div class="tool-icon">&#8682;</div>
             <h3>Documents</h3>
             <p>CVs, certificates, and other PDFs in one clean page.</p>
             <div class="tool-footer">
               <span class="status">Primary</span>
-              <span class="arrow">→</span>
+              <span class="arrow">&#8594;</span>
             </div>
           </a>
 
           <a class="tool-card" href="./earthquakes/" style="--card-accent: #f97316;">
-            <div class="tool-icon">◉</div>
+            <div class="tool-icon">&#9673;</div>
             <h3>Earthquakes</h3>
             <p>Live USGS map with magnitude, alert, and event details.</p>
             <div class="tool-footer">
               <span class="status">Live</span>
-              <span class="arrow">→</span>
+              <span class="arrow">&#8594;</span>
             </div>
           </a>
 
           <a class="tool-card" href="./tools/" style="--card-accent: #38bdf8;">
-            <div class="tool-icon">⌘</div>
+            <div class="tool-icon">&#8984;</div>
             <h3>Tools</h3>
             <p>Space for small helpers, calculators, and workflows.</p>
             <div class="tool-footer">
               <span class="status">Planned</span>
-              <span class="arrow">→</span>
+              <span class="arrow">&#8594;</span>
             </div>
           </a>
 
           <a class="tool-card" href="./notes/" style="--card-accent: #a78bfa;">
-            <div class="tool-icon">✦</div>
+            <div class="tool-icon">&#10022;</div>
             <h3>Notes</h3>
             <p>Indexes, summaries, and knowledge pages when you need them.</p>
             <div class="tool-footer">
               <span class="status">Planned</span>
-              <span class="arrow">→</span>
+              <span class="arrow">&#8594;</span>
             </div>
           </a>
         </div>
