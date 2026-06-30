@@ -329,6 +329,7 @@
         <option value="m5_month">M5.0+, past 30 days</option>
         <option value="m55_month">M5.5+, past 30 days</option>
         <option value="m6_month">M6.0+, past 30 days</option>
+        <option value="m6_72h">M6.0+, past 72 hours</option>
         <option value="significant_month" selected>USGS significant, past 30 days</option>
       </select>
     </div>
@@ -395,6 +396,11 @@
   m6_month: {
     label: "M6.0+, past 30 days",
     days: 30,
+    minMagnitude: 6.0
+  },
+  m6_72h: {
+    label: "M6.0+, past 72 hours",
+    days: 3,
     minMagnitude: 6.0
   },
   significant_month: {

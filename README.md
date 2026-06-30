@@ -1,8 +1,32 @@
-# earthquake-dashboard
+# Dashboard Hub
 
-This is a dashboard setup for an obsidian embed, so i can keep up to date with relevant informaiton like earthquakes, news, volcanoes, and other things of that i would want to look at on my obsidian dashboard.
+A compact GitHub Pages site with a few useful web pages:
 
-go to '
+- `index.html` — the main hub and overview
+- `documents/` — a shareable document page for CVs, certificates, and PDFs
+- `earthquakes/` — a live USGS earthquake map and alert view
 
+## What it’s for
 
-https://remkopape.github.io/dashboard-hub/earthquakes/
+This repo is meant to be easy to share and easy to embed in Obsidian. The
+homepage stays small and readable, while the documents page is the main public
+sharing link.
+
+The homepage also includes a compact readme/about section and a live earthquake
+notification for major USGS events from the last 72 hours.
+
+## Documents
+
+The documents page automatically reads PDF files from `documents/files/`.
+Add or rename a PDF there, and the page updates with the new file list.
+
+## Earthquakes
+
+The earthquake dashboard shows live USGS data and includes recent feed options,
+including major earthquakes from the last 72 hours.
+
+## Shared link
+
+Use this page as the main entry point:
+
+https://remkopape.github.io/dashboard-hub/

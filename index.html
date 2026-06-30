@@ -187,6 +187,25 @@
       line-height: 1.55;
     }
 
+    .summary-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .summary-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     .side-stack {
       display: grid;
       gap: 12px;
@@ -206,6 +225,50 @@
       color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
+    }
+
+    .notice-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .notice-link:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.22);
+      transform: translateY(-1px);
+    }
+
+    .notice-kicker {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .notice-title {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .notice-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .notice-footer {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
     }
 
     .section-head {
@@ -375,27 +438,44 @@
           <h1>One compact hub for shared documents and live dashboards.</h1>
 
           <p>
-            This is the simple front door for the repository: the documents page is
-            the main share link, and the earthquake dashboard is the live example.
+            This site keeps a few useful things in one place: a shareable document hub,
+            a live earthquake map, and space for a few extra tools later on.
           </p>
+
+          <div class="summary-tags">
+            <span class="summary-tag">Documents</span>
+            <span class="summary-tag">Live earthquakes</span>
+            <span class="summary-tag">Future tools</span>
+          </div>
         </div>
 
         <div class="side-stack">
           <aside class="panel side-card">
-            <h2>Quick links</h2>
-            <p>Jump straight to the pages you’ll share most often.</p>
+            <h2>Notifications</h2>
+            <a class="notice-link" id="quakeNotice" href="./earthquakes/">
+              <span class="notice-kicker">Earthquakes · 72 hours</span>
+              <span class="notice-title">Loading recent major earthquakes…</span>
+              <span class="notice-subtitle">The latest major event will appear here from the USGS feed.</span>
+            </a>
 
-            <div class="top-links" style="justify-content:flex-start; margin-top:10px;">
-              <a class="chip-link" href="./documents/">Documents</a>
-              <a class="chip-link" href="./earthquakes/">Earthquakes</a>
+            <a class="notice-link" href="./documents/" style="margin-top:10px;">
+              <span class="notice-kicker">Updates later</span>
+              <span class="notice-title">Documents and other updates</span>
+              <span class="notice-subtitle">Use this space later for new document updates or other recent additions.</span>
+            </a>
+
+            <div class="notice-footer">
+              <a class="chip-link" href="./documents/">Documents updates</a>
+              <a class="chip-link" href="./earthquakes/">Open quake map</a>
             </div>
           </aside>
 
           <aside class="panel side-card">
-            <h2>What it contains</h2>
+            <h2>About this page</h2>
             <p>
-              Compact cards, a calmer background, and less filler so you can see the
-              useful parts at a glance when embedded in Obsidian.
+              This page was established by Remko H. Pape, with a background in
+              environmental science and an Avans bachelor. See the documents page
+              for the CV and supporting files.
             </p>
           </aside>
         </div>
@@ -457,5 +537,61 @@
       </section>
     </main>
   </div>
+
+  <script>
+    const quakeNotice = document.getElementById('quakeNotice');
+
+    function formatRelativeTime(milliseconds) {
+      if (!milliseconds) return 'recently';
+      const diffMinutes = Math.max(0, Math.round((Date.now() - milliseconds) / 60000));
+      if (diffMinutes < 60) return `${diffMinutes}m ago`;
+      const diffHours = Math.round(diffMinutes / 60);
+      if (diffHours < 48) return `${diffHours}h ago`;
+      const diffDays = Math.round(diffHours / 24);
+      return `${diffDays}d ago`;
+    }
+
+    async function loadEarthquakeNotice() {
+      if (!quakeNotice) return;
+
+      try {
+        const end = new Date();
+        const start = new Date(Date.now() - 72 * 60 * 60 * 1000);
+        const params = new URLSearchParams({
+          format: 'geojson',
+          starttime: start.toISOString(),
+          endtime: end.toISOString(),
+          minmagnitude: '6',
+          eventtype: 'earthquake',
+          orderby: 'time',
+        });
+
+        const response = await fetch(`https://earthquake.usgs.gov/fdsnws/event/1/query?${params.toString()}`);
+        if (!response.ok) throw new Error(`USGS returned ${response.status}`);
+
+        const data = await response.json();
+        const latest = data.features && data.features[0];
+        if (!latest) {
+          quakeNotice.querySelector('.notice-title').textContent = 'No major earthquakes in the last 72 hours.';
+          quakeNotice.querySelector('.notice-subtitle').textContent = 'The USGS feed is currently clear for M6.0+ events.';
+          return;
+        }
+
+        const properties = latest.properties || {};
+        const magnitude = Number(properties.mag || 0).toFixed(1);
+        const place = properties.place || 'unknown location';
+        const when = formatRelativeTime(properties.time);
+
+        quakeNotice.querySelector('.notice-title').textContent = `M${magnitude} near ${place}`;
+        quakeNotice.querySelector('.notice-subtitle').textContent = `Latest major quake in the past 72 hours · ${when}`;
+      } catch (error) {
+        quakeNotice.querySelector('.notice-title').textContent = 'Earthquake notice unavailable.';
+        quakeNotice.querySelector('.notice-subtitle').textContent = 'Open the earthquake page to see the live map and feeds.';
+        console.error(error);
+      }
+    }
+
+    loadEarthquakeNotice();
+  </script>
 </body>
 </html>
