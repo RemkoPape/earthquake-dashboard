@@ -52,6 +52,8 @@
     }
 
     .topbar {
+      position: relative;
+      z-index: 2000;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -97,6 +99,8 @@
     }
 
     .topbar-actions {
+      position: relative;
+      z-index: 2001;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -119,6 +123,10 @@
       border: 1px solid var(--border);
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.04);
+      appearance: none;
+      font: inherit;
+      line-height: 1;
+      cursor: pointer;
     }
 
     .chip-link:hover {
@@ -128,6 +136,18 @@
 
     .notification-wrap {
       position: relative;
+      z-index: 1000;
+    }
+
+    .notification-scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 1500;
+      background: transparent;
+    }
+
+    .notification-scrim[hidden] {
+      display: none;
     }
 
     .bell-button {
@@ -167,18 +187,50 @@
       font-weight: 700;
     }
 
+    .bell-count[hidden] {
+      display: none;
+    }
+
     .notif-popover {
-      position: absolute;
-      top: calc(100% + 10px);
+      position: fixed;
+      top: 72px;
       right: 0;
       width: min(380px, calc(100vw - 24px));
       padding: 14px;
       border-radius: 18px;
-      z-index: 20;
+      z-index: 1600;
+      border-color: rgba(255, 255, 255, 0.22);
+      box-shadow: 0 26px 70px rgba(0, 0, 0, 0.65);
+      max-height: calc(100vh - 90px);
+      overflow: auto;
+      isolation: isolate;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
     }
 
     .notif-popover[hidden] {
       display: none;
+    }
+
+    .notif-backdrop {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      background: rgba(7, 16, 25, 0.9);
+      backdrop-filter: blur(30px) saturate(170%);
+      -webkit-backdrop-filter: blur(30px) saturate(170%);
+      z-index: 0;
+    }
+
+    .notif-popover > :not(.notif-backdrop) {
+      position: relative;
+      z-index: 1;
     }
 
     .notif-header {
@@ -207,14 +259,12 @@
     }
 
     .notif-item {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      text-decoration: none;
-      padding: 11px 12px;
+      position: relative;
+      display: block;
+      padding: 11px 42px 11px 12px;
       border-radius: 14px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.1);
       transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
     }
 
@@ -226,6 +276,35 @@
 
     .notif-item.muted {
       opacity: 0.7;
+    }
+
+    .notif-link {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .notif-dismiss {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .notif-dismiss:hover {
+      background: rgba(255, 255, 255, 0.16);
     }
 
     .notif-kind {
@@ -517,38 +596,41 @@
       </a>
 
       <div class="topbar-actions">
-        <div class="notification-wrap">
+        <nav class="top-links">
+          <a class="chip-link" href="./documents/">Documents</a>
+          <a class="chip-link" href="./earthquakes/">Earthquakes</a>
+          <a class="chip-link" href="https://github.com/remkopape/dashboard-hub" target="_blank" rel="noopener">GitHub</a>
+
+          <div class="notification-wrap">
           <button class="bell-button" id="notificationButton" type="button" aria-expanded="false" aria-controls="notificationPopover">
             <span class="bell-icon">🔔</span>
             <span>Notifications</span>
-            <span class="bell-count" id="notificationCount">0</span>
+            <span class="bell-count" id="notificationCount" hidden>0</span>
           </button>
 
           <div class="notif-popover panel" id="notificationPopover" hidden>
+            <div class="notif-backdrop" aria-hidden="true"></div>
             <div class="notif-header">
               <div>
                 <h2>Recent updates</h2>
                 <p>Earthquake alerts, document updates, and future notices.</p>
               </div>
-              <a class="chip-link" href="./documents/" style="padding:6px 9px;">Open documents</a>
+              <button class="chip-link" id="clearNotificationsButton" type="button" style="padding:6px 9px;">Clear all</button>
             </div>
 
             <div class="notif-list" id="notificationList"></div>
 
             <div class="notif-actions">
-              <a class="chip-link" href="./earthquakes/">Earthquakes</a>
-              <a class="chip-link" href="./documents/">Documents</a>
+                <a class="chip-link" href="./earthquakes/">Earthquakes</a>
+                <a class="chip-link" href="./documents/">Documents</a>
+              </div>
             </div>
           </div>
-        </div>
-
-        <nav class="top-links">
-          <a class="chip-link" href="./documents/">Documents</a>
-          <a class="chip-link" href="./earthquakes/">Earthquakes</a>
-          <a class="chip-link" href="https://github.com/remkopape/dashboard-hub" target="_blank" rel="noopener">GitHub</a>
         </nav>
       </div>
     </header>
+
+    <div class="notification-scrim" id="notificationScrim" hidden></div>
 
     <main>
       <section class="hero">
@@ -654,6 +736,28 @@
     const notificationPopover = document.getElementById('notificationPopover');
     const notificationCount = document.getElementById('notificationCount');
     const notificationList = document.getElementById('notificationList');
+    const notificationScrim = document.getElementById('notificationScrim');
+    const clearNotificationsButton = document.getElementById('clearNotificationsButton');
+    const dismissedNotificationsKey = 'dashboard-hub-dismissed-notifications';
+    const notificationWindowMs = 72 * 60 * 60 * 1000;
+    const repoFullName = 'remkopape/dashboard-hub';
+    const currentTime = Date.now();
+
+    function loadDismissedNotifications() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(dismissedNotificationsKey) || '[]');
+        return new Set(Array.isArray(parsed) ? parsed : []);
+      } catch (error) {
+        console.error(error);
+        return new Set();
+      }
+    }
+
+    function saveDismissedNotifications(dismissed) {
+      localStorage.setItem(dismissedNotificationsKey, JSON.stringify([...dismissed]));
+    }
+
+    let dismissedNotifications = loadDismissedNotifications();
 
     function formatRelativeTime(milliseconds) {
       if (!milliseconds) return 'recently';
@@ -674,34 +778,50 @@
         .replace(/'/g, '&#39;');
     }
 
+    function isRecent(milliseconds) {
+      return typeof milliseconds === 'number' && milliseconds >= currentTime - notificationWindowMs;
+    }
+
+    function notificationId(notification) {
+      return notification.id || `${notification.kind}:${notification.title}`;
+    }
+
     function renderNotificationItem(notification) {
       const classes = ['notif-item'];
       if (notification.muted) classes.push('muted');
 
-      const openingTag = notification.href
-        ? `<a class="${classes.join(' ')}" href="${notification.href}">`
-        : `<div class="${classes.join(' ')}">`;
-      const closingTag = notification.href ? '</a>' : '</div>';
+      const content = notification.href
+        ? `<a class="notif-link" href="${notification.href}">
+            <span class="notif-kind">${escapeHtml(notification.kind)}</span>
+            <span class="notif-title">${escapeHtml(notification.title)}</span>
+            <span class="notif-subtitle">${escapeHtml(notification.subtitle)}</span>
+          </a>`
+        : `<div class="notif-link">
+            <span class="notif-kind">${escapeHtml(notification.kind)}</span>
+            <span class="notif-title">${escapeHtml(notification.title)}</span>
+            <span class="notif-subtitle">${escapeHtml(notification.subtitle)}</span>
+          </div>`;
 
       return `
-        ${openingTag}
-          <span class="notif-kind">${escapeHtml(notification.kind)}</span>
-          <span class="notif-title">${escapeHtml(notification.title)}</span>
-          <span class="notif-subtitle">${escapeHtml(notification.subtitle)}</span>
-        ${closingTag}
+        <div class="${classes.join(' ')}">
+          <button class="notif-dismiss" type="button" data-dismiss-id="${escapeHtml(notificationId(notification))}" aria-label="Dismiss notification">×</button>
+          ${content}
+        </div>
       `;
     }
 
     function updateNotificationPanel(notifications) {
       const activeNotifications = notifications.filter((item) => !item.muted);
       notificationCount.textContent = String(activeNotifications.length);
-      notificationList.innerHTML = notifications.length
-        ? notifications.map(renderNotificationItem).join('')
-        : '<div class="notif-item muted"><span class="notif-kind">None</span><span class="notif-title">No recent notifications</span><span class="notif-subtitle">Try again later for earthquake or document updates.</span></div>';
+      notificationCount.hidden = activeNotifications.length === 0;
+      notificationList.innerHTML = activeNotifications.length
+        ? activeNotifications.map(renderNotificationItem).join('')
+        : '';
     }
 
     function setPopover(open) {
       notificationPopover.hidden = !open;
+      notificationScrim.hidden = !open;
       notificationButton.setAttribute('aria-expanded', open ? 'true' : 'false');
     }
 
@@ -720,10 +840,27 @@
       if (event.key === 'Escape') setPopover(false);
     });
 
+    notificationScrim.addEventListener('click', () => setPopover(false));
+    clearNotificationsButton.addEventListener('click', () => {
+      dismissedNotifications = new Set();
+      saveDismissedNotifications(dismissedNotifications);
+      loadNotifications();
+    });
+
+    notificationList.addEventListener('click', (event) => {
+      const dismissButton = event.target.closest('[data-dismiss-id]');
+      if (!dismissButton) return;
+
+      const notificationKey = dismissButton.getAttribute('data-dismiss-id');
+      dismissedNotifications.add(notificationKey);
+      saveDismissedNotifications(dismissedNotifications);
+      loadNotifications();
+    });
+
     async function fetchEarthquakeNotification() {
       try {
-        const end = new Date();
-        const start = new Date(Date.now() - 72 * 60 * 60 * 1000);
+        const end = new Date(currentTime);
+        const start = new Date(currentTime - notificationWindowMs);
         const params = new URLSearchParams({
           format: 'geojson',
           starttime: start.toISOString(),
@@ -738,13 +875,8 @@
 
         const data = await response.json();
         const latest = data.features && data.features[0];
-        if (!latest) {
-          return {
-            kind: 'Earthquakes',
-            title: 'No major earthquakes in the last 72 hours.',
-            subtitle: 'The USGS feed is currently clear for M6.0+ events.',
-            href: './earthquakes/',
-          };
+        if (!latest || !isRecent(latest.properties?.time)) {
+          return null;
         }
 
         const properties = latest.properties || {};
@@ -753,6 +885,7 @@
         const when = formatRelativeTime(properties.time);
 
         return {
+          id: `earthquake:${latest.id || properties.time || magnitude}:${properties.time || ''}`,
           kind: 'Earthquakes',
           title: `M${magnitude} near ${place}`,
           subtitle: `Latest major quake in the past 72 hours · ${when}`,
@@ -760,53 +893,38 @@
         };
       } catch (error) {
         console.error(error);
-        return {
-          kind: 'Earthquakes',
-          title: 'Earthquake notice unavailable.',
-          subtitle: 'Open the earthquake page to see the live map and feeds.',
-          href: './earthquakes/',
-          muted: true,
-        };
+        return null;
       }
     }
 
     async function fetchDocumentsNotification() {
       try {
-        const response = await fetch('https://api.github.com/repos/remkopape/dashboard-hub/contents/documents/files', {
+        const response = await fetch(`https://api.github.com/repos/${repoFullName}/commits?path=documents/files&per_page=1`, {
           headers: { Accept: 'application/vnd.github+json' },
         });
 
         if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
 
-        const items = await response.json();
-        const pdfCount = items.filter((item) => item.type === 'file' && /\.pdf$/i.test(item.name)).length;
+        const commits = await response.json();
+        const latestCommit = commits && commits[0];
+        const commitDate = latestCommit ? new Date(latestCommit.commit?.committer?.date || latestCommit.commit?.author?.date).getTime() : 0;
+        if (!latestCommit || !isRecent(commitDate)) return null;
 
         return {
+          id: `documents:${latestCommit.sha}`,
           kind: 'Documents',
-          title: `${pdfCount} PDF${pdfCount === 1 ? '' : 's'} available to share`,
-          subtitle: 'The documents page stays in sync with the file folder.',
+          title: 'Recent documents update',
+          subtitle: `The documents page changed ${formatRelativeTime(commitDate)}.`,
           href: './documents/',
         };
       } catch (error) {
         console.error(error);
-        return {
-          kind: 'Documents',
-          title: 'Documents updates unavailable.',
-          subtitle: 'Open the documents page to view the current file list.',
-          href: './documents/',
-          muted: true,
-        };
+        return null;
       }
     }
 
     function futureNotification() {
-      return {
-        kind: 'Future',
-        title: 'More updates later',
-        subtitle: 'This slot is ready for future document or site notifications.',
-        href: './documents/',
-        muted: true,
-      };
+      return null;
     }
 
     async function loadNotifications() {
@@ -815,11 +933,13 @@
         fetchDocumentsNotification(),
       ]);
 
-      updateNotificationPanel([
+      const notifications = [
         earthquakeNotification,
         documentsNotification,
         futureNotification(),
-      ].filter(Boolean));
+      ].filter(Boolean).filter((notification) => !dismissedNotifications.has(notificationId(notification)));
+
+      updateNotificationPanel(notifications);
     }
 
     loadNotifications();

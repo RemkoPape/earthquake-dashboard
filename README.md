@@ -14,6 +14,7 @@ sharing link.
 
 The homepage includes a compact readme/about section plus a notification bell
 for recent earthquake alerts and document updates from the last 72 hours.
+Anything older than 72 hours is filtered out.
 
 ## Documents
 
@@ -29,7 +30,10 @@ The homepage notification bell shows:
 
 - recent major earthquakes from the USGS feed
 - document collection updates from `documents/files/`
-- a placeholder slot for future site updates
+- future site updates when they are added
+
+Notifications can be dismissed individually or cleared all at once, and nothing
+is shown when there are no recent updates.
 
 ## Shared link
 
