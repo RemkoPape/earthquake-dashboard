@@ -26,6 +26,15 @@ Add or rename a PDF there, and the page updates with the new file list.
 The earthquake dashboard shows live USGS data and includes recent feed options,
 including major earthquakes from the last 72 hours.
 
+## RSS notes
+
+`OnlyNews.py` is a small RSS-to-Obsidian note generator.
+
+- add your feed URLs at the top of `OnlyNews.py`
+- run it to create article notes in your chosen output folder
+- each note links back to `Dashboard Hub`, `Documents`, and `Earthquakes`
+- source notes are created alongside the articles so everything stays linked
+
 The homepage notification bell shows:
 
 - recent major earthquakes from the USGS feed
