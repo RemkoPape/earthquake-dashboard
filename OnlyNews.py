@@ -15,6 +15,27 @@ import feedparser
 
 
 BASE_DIR = Path(__file__).resolve().parent
+def load_env_file(path: Path) -> None:
+    if not path.exists():
+        return
+
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("export "):
+            line = line[7:].strip()
+        if "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
+load_env_file(BASE_DIR / ".env")
 DEFAULT_OUTPUT_DIR = Path(os.getenv("ONLYNEWS_OUTPUT_DIR", BASE_DIR / "news"))
 DEFAULT_LIMIT_PER_FEED = int(os.getenv("ONLYNEWS_LIMIT_PER_FEED", "8"))
 STATE_FILE_NAME = ".onlynews-state.json"

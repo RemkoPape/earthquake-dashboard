@@ -17,6 +17,27 @@ The homepage includes a compact readme/about section, a notification bell for
 recent earthquakes, document updates, and RSS updates from the last 72 hours,
 plus a compact latest-news preview.
 
+## Environment setup
+
+This repo now supports a root `.env` file for the local Python scripts.
+
+1. Copy `.env.example` to `.env`
+2. Fill in the values you want to use
+
+Available variables:
+
+- `FIRMS_MAP_KEY` - required for `scripts/update_fires.py`
+- `ONLYNEWS_OUTPUT_DIR` - optional override for `OnlyNews.py` output folder
+- `ONLYNEWS_LIMIT_PER_FEED` - optional override for how many feed items `OnlyNews.py` reads per source
+
+Example:
+
+```env
+FIRMS_MAP_KEY=your_firms_map_key_here
+ONLYNEWS_OUTPUT_DIR=news
+ONLYNEWS_LIMIT_PER_FEED=8
+```
+
 ## Documents
 
 The documents page automatically reads PDF files from `documents/files/`.

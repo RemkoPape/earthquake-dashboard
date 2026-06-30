@@ -38,6 +38,29 @@ DISCLAIMER = (
 )
 
 
+def load_env_file(path: Path) -> None:
+  if not path.exists():
+    return
+
+  for raw_line in path.read_text(encoding="utf-8").splitlines():
+    line = raw_line.strip()
+    if not line or line.startswith("#"):
+      continue
+    if line.startswith("export "):
+      line = line[7:].strip()
+    if "=" not in line:
+      continue
+
+    key, value = line.split("=", 1)
+    key = key.strip()
+    value = value.strip().strip('"').strip("'")
+    if key and key not in os.environ:
+      os.environ[key] = value
+
+
+load_env_file(ROOT_DIR / ".env")
+
+
 def utc_now() -> datetime:
   return datetime.now(timezone.utc)
 
