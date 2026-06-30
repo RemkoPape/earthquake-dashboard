@@ -754,7 +754,14 @@ async function refreshMapForCurrentState() {
     });
     setMapData(state.currentCollection);
     elements.lastUpdate.textContent = "error";
-    setStatusMessage("Could not load live FIRMS wildfire data. Check `wildfires/config.js` and browser network access.");
+    const message = String(error && error.message ? error.message : error || "");
+    if (message.includes("(404)")) {
+      setStatusMessage("FIRMS returned 404. The public key in `wildfires/config.js` is likely invalid, expired, or not accepted.");
+    } else if (message.includes("Missing public FIRMS map key")) {
+      setStatusMessage("No public FIRMS key was found. Add one to `wildfires/config.js`.");
+    } else {
+      setStatusMessage("Could not load live FIRMS wildfire data. Check `wildfires/config.js`, the FIRMS key, and browser network access.");
+    }
   }
 }
 
