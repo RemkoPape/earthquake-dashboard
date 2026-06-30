@@ -738,6 +738,7 @@
         <nav class="top-links">
           <a class="chip-link" href="./documents/">Documents</a>
           <a class="chip-link" href="./earthquakes/">Earthquakes</a>
+          <a class="chip-link" href="./news/">RSS Notes</a>
           <a class="chip-link" href="https://github.com/remkopape/dashboard-hub" target="_blank" rel="noopener">GitHub</a>
 
           <div class="notification-wrap">
@@ -762,6 +763,7 @@
             <div class="notif-actions">
                 <a class="chip-link" href="./earthquakes/">Earthquakes</a>
                 <a class="chip-link" href="./documents/">Documents</a>
+                <a class="chip-link" href="./news/">RSS Notes</a>
               </div>
             </div>
           </div>
@@ -783,13 +785,13 @@
 
           <p>
             This site keeps a few useful things in one place: a shareable document hub,
-            a live earthquake map, and space for a few extra tools later on.
+            a live earthquake map, and a simple RSS-to-Obsidian clipping flow.
           </p>
 
           <div class="summary-tags">
             <span class="summary-tag">Documents</span>
             <span class="summary-tag">Live earthquakes</span>
-            <span class="summary-tag">Future tools</span>
+            <span class="summary-tag">RSS notes</span>
           </div>
         </div>
 
@@ -798,7 +800,7 @@
             <h2>README</h2>
             <p>
               A compact hub for a shareable document page, a live earthquake map,
-              and a few extra tools or notes later on.
+              and RSS-to-Obsidian notes that link articles back into the site.
             </p>
           </aside>
 
@@ -852,12 +854,12 @@
             </div>
           </a>
 
-          <a class="tool-card" href="./notes/" style="--card-accent: #a78bfa;">
-            <div class="tool-icon">&#10022;</div>
-            <h3>Notes</h3>
-            <p>Indexes, summaries, and knowledge pages when you need them.</p>
+          <a class="tool-card" href="./news/" style="--card-accent: #a78bfa;">
+            <div class="tool-icon">&#128240;</div>
+            <h3>RSS Notes</h3>
+            <p>Obsidian-ready article notes and source pages from your RSS feeds.</p>
             <div class="tool-footer">
-              <span class="status">Planned</span>
+              <span class="status">Clippings</span>
               <span class="arrow">&#8594;</span>
             </div>
           </a>
@@ -943,7 +945,7 @@
 
       return `
         <div class="${classes.join(' ')}">
-          <button class="notif-dismiss" type="button" data-dismiss-id="${escapeHtml(notificationId(notification))}" aria-label="Dismiss notification">×</button>
+          <button class="notif-dismiss" type="button" data-dismiss-id="${escapeHtml(notificationId(notification))}" aria-label="Dismiss notification">&times;</button>
           ${content}
         </div>
       `;
@@ -1027,7 +1029,7 @@
           id: `earthquake:${latest.id || properties.time || magnitude}:${properties.time || ''}`,
           kind: 'Earthquakes',
           title: `M${magnitude} near ${place}`,
-          subtitle: `Latest major quake in the past 72 hours · ${when}`,
+          subtitle: `Latest major quake in the past 72 hours \u00b7 ${when}`,
           href: './earthquakes/',
         };
       } catch (error) {

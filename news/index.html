@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RSS Notes</title>
+  <style>
+    :root {
+      --bg: #09141b;
+      --panel: rgba(255, 250, 240, 0.08);
+      --panel-strong: rgba(255, 250, 240, 0.11);
+      --border: rgba(255, 250, 240, 0.16);
+      --text: #f8f3ea;
+      --muted: #d5cabb;
+      --accent: #f2a65a;
+      --accent-soft: rgba(242, 166, 90, 0.18);
+      --shadow: rgba(0, 0, 0, 0.34);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(242, 166, 90, 0.18), transparent 30%),
+        radial-gradient(circle at 85% 18%, rgba(86, 137, 166, 0.22), transparent 26%),
+        linear-gradient(180deg, #10212a 0%, var(--bg) 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 250, 240, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 250, 240, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, black, transparent 92%);
+    }
+
+    a { color: inherit; }
+
+    .page {
+      width: min(980px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar,
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: linear-gradient(180deg, var(--panel-strong), var(--panel));
+      box-shadow: 0 18px 42px var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), transparent 12%),
+        linear-gradient(135deg, #f2a65a, #5689a6 62%, #1c3d4f);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+      flex: none;
+    }
+
+    .brand-text strong {
+      display: block;
+      font-size: 17px;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-text span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .top-links,
+    .actions,
+    .card-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip-link,
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      text-decoration: none;
+      background: rgba(255, 250, 240, 0.05);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .chip-link:hover,
+    .button:hover {
+      color: var(--text);
+      background: rgba(255, 250, 240, 0.1);
+    }
+
+    .button.primary {
+      background: var(--accent);
+      color: #1f140a;
+      border-color: rgba(242, 166, 90, 0.7);
+      font-weight: 700;
+    }
+
+    .hero {
+      padding: 28px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      bottom: -80px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(242, 166, 90, 0.28), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(242, 166, 90, 0.28);
+      color: #f6d3ab;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+
+    h1, h2, h3, p, pre {
+      margin: 0;
+    }
+
+    h1 {
+      max-width: 720px;
+      font-size: clamp(36px, 5vw, 58px);
+      line-height: 0.95;
+      letter-spacing: -1.8px;
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .hero .actions {
+      margin-top: 22px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      padding: 20px;
+    }
+
+    .panel h2 {
+      font-size: 24px;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    .panel p,
+    .panel li {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .steps,
+    .note-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .step,
+    .note-card {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 250, 240, 0.14);
+      background: rgba(255, 250, 240, 0.04);
+    }
+
+    .step strong,
+    .note-card strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .code-block {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 250, 240, 0.12);
+      background: rgba(7, 12, 16, 0.7);
+      overflow: auto;
+    }
+
+    pre,
+    code {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 13px;
+    }
+
+    .inline-code {
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(255, 250, 240, 0.08);
+      border: 1px solid rgba(255, 250, 240, 0.1);
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .panel ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 14px;
+      opacity: 0.92;
+    }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: min(100vw - 18px, 980px);
+        padding-top: 10px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .hero p {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="../" aria-label="Dashboard Hub home">
+        <div class="logo"></div>
+        <div class="brand-text">
+          <strong>Dashboard Hub</strong>
+          <span>RSS notes for Obsidian</span>
+        </div>
+      </a>
+
+      <nav class="top-links">
+        <a class="chip-link" href="../">Home</a>
+        <a class="chip-link" href="../documents/">Documents</a>
+        <a class="chip-link" href="../earthquakes/">Earthquakes</a>
+        <a class="chip-link" href="https://github.com/remkopape/dashboard-hub" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="panel hero">
+        <div class="eyebrow">RSS Notes</div>
+        <h1>Turn RSS feeds into clean Obsidian article notes.</h1>
+        <p>
+          This page describes the local clipping flow powered by <span class="inline-code">OnlyNews.py</span>.
+          It skips AI processing, lets you define your own RSS sources, and keeps the notes connected to the
+          wider dashboard through shared links and source pages.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="../OnlyNews.py">Open script</a>
+          <a class="button" href="../">Back to hub</a>
+          <a class="button" href="../documents/">Open documents</a>
+          <a class="button" href="../earthquakes/">Open earthquakes</a>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="panel">
+          <h2>How it works</h2>
+          <div class="steps">
+            <div class="step">
+              <strong>1. Add feeds</strong>
+              Edit the <span class="inline-code">RSS_FEEDS</span> block in <span class="inline-code">OnlyNews.py</span> and paste in the RSS URLs you want to track.
+            </div>
+            <div class="step">
+              <strong>2. Run the collector</strong>
+              The script reads the newest entries, skips anything already seen, and writes article notes plus source notes.
+            </div>
+            <div class="step">
+              <strong>3. Review in Obsidian</strong>
+              Each note uses the article template, includes the original link, and links back to Dashboard Hub, Documents, and Earthquakes.
+            </div>
+          </div>
+
+          <div class="code-block">
+            <pre><code>RSS_FEEDS = {
+    "General": [
+        "https://example.com/rss.xml",
+        "https://example.org/feed",
+    ],
+    "Climate": [
+        "https://example.net/climate.rss",
+    ],
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="stack">
+          <aside class="panel">
+            <h2>Output</h2>
+            <div class="note-list">
+              <div class="note-card">
+                <strong>Article notes</strong>
+                New entries are written into <span class="inline-code">news/articles/</span> by group, ready for Obsidian.
+              </div>
+              <div class="note-card">
+                <strong>Source notes</strong>
+                Feed-level notes are written into <span class="inline-code">news/sources/</span> so the articles stay grouped by source.
+              </div>
+              <div class="note-card">
+                <strong>Seen state</strong>
+                The script tracks handled items in <span class="inline-code">news/.onlynews-state.json</span> to avoid duplicates.
+              </div>
+            </div>
+          </aside>
+
+          <aside class="panel">
+            <h2>Commands</h2>
+            <div class="code-block">
+              <pre><code>python OnlyNews.py
+python OnlyNews.py --dry-run
+python OnlyNews.py --output "C:\Path\To\Your\Vault\News"</code></pre>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>What gets created</h2>
+        <p>
+          The article notes follow your Obsidian template with title, aliases, date, source note, feed title, author,
+          link, tags, summary block, key points, notes, article content, and related links. This page is just the public
+          guide; the actual markdown notes are meant to be read and edited inside Obsidian.
+        </p>
+        <div class="card-links" style="margin-top: 16px;">
+          <a class="chip-link" href="../">Hub overview</a>
+          <a class="chip-link" href="../documents/">Documents page</a>
+          <a class="chip-link" href="../earthquakes/">Earthquake page</a>
+          <a class="chip-link" href="../README.md">Project README</a>
+        </div>
+      </section>
+
+      <div class="footer-note">
+        Local RSS collection for Obsidian, connected back into the same dashboard ecosystem.
+      </div>
+    </main>
+  </div>
+</body>
+</html>
